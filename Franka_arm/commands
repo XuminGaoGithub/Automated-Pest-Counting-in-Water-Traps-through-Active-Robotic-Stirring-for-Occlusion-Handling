@@ -1,0 +1,181 @@
+https://172.16.0.2/desk/
+
+
+~/ws_franka_library/libfranka/build$ cd ws_franka_library/libfranka/build/
+~/ws_franka_library/libfranka/build$ ./examples/echo_robot_state 172.16.0.2
+
+打开.bashrc文件
+sudo gedit ~/.bashrc
+
+source ~/.bashrc
+
+
+source ~/ws_robots/install/setup.bash
+source ~/ws_sensors/install/setup.bash
+source ~/ws_active_perception/install/setup.bash
+source ~/ws_franka_moveit/install/setup.bash
+
+
+ros2 launch franka_bringup move_to_start_example_controller.launch.py arm_id:=fr3 robot_ip:=172.16.0.2
+
+ros2 launch franka_bringup gravity_compensation_example_controller.launch.py arm_id:=fr3 robot_ip:=172.16.0.2
+
+
+
+
+ros2 launch franka_moveit_config moveit.launch.py robot_ip:=172.16.0.2
+
+ros2 launch franka_moveit_config moveit.launch.py robot_ip:=dont-care use_fake_hardware:=true
+
+ros2 launch franka_moveit_config moveit_real_arm_platform.launch.py robot_ip:=172.16.0.2 camera_type:=blackfly_s serial:="'22141921'" load_camera:=False planner:=pilz_industrial_motion_planner/CommandPlanner use_fake_hardware:=True
+
+ros2 launch franka_fr3_moveit_config moveit.launch.py robot_ip:=172.16.0.2
+
+
+
+----------------------------------------------------------------------------
+echo $AMENT_PREFIX_PATH
+echo $LD_LIBRARY_PATH
+ldd ~/ws_robots/install/franka_hardware/lib/libfranka_hardware.so | grep franka
+
+
+# 先清掉之前的 overlay
+unset AMENT_PREFIX_PATH
+unset LD_LIBRARY_PATH
+
+# 加载基础 ROS、再加载 ws_robots
+source /opt/ros/humble/setup.bash
+source ~/ws_robots/install/setup.bash
+
+
+franka@franka-PC-BX19152:~/ws_robots$ source ~/ws_robots/install/setup.bash
+franka@franka-PC-BX19152:~/ws_robots$ ros2 launch franka_moveit_config moveit_real_arm.launch.py robot_ip:=172.16.0.2
+
+
+
+
+franka@franka-PC-BX19152:~/ws_active_perception$ source ~/ws_active_perception/install/setup.bash
+cd ~/ws_active_perception
+
+#add moveit_test.cpp to /src and revise  CMakeLists.txt
+
+colcon build --packages-select moveit2_commander_recorder --cmake-clean-cache
+
+colcon build --packages-select moveit2_commander_recorder # for cmakelist with opencv,如果带--cmake-clean-cache会导致opencv重新编译
+
+source install/setup.bash
+
+franka@franka-PC-BX19152:~/ws_active_perception$ ros2 launch moveit2_commander_recorder moveit_test.launch.py
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=round
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=spiral video_name:=experiment
+
+
+打开.bashrc文件
+sudo gedit ~/.bashrc
+source ~/.bashrc
+source install/setup.bash
+ 
+ 
+ 
+ 
+#配置网络 
+sudo nm-connection-editor
+manual
+192.168.1.20
+
+#设置摄像头为高分辨率
+    #v4l2-ctl --list-devices
+    #v4l2-ctl --device=/dev/video2 --list-formats-ext
+    #v4l2-ctl --device=/dev/video2 --set-fmt-video=width=1920,height=1080,pixelformat=MJPG
+    #v4l2-ctl --device=/dev/video2 --get-fmt-video
+
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=round video_name:=low_round_5
+
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=square video_name:=low_square_5
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=triangle video_name:=low_triangle_5
+
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=spiral video_name:=low_spiral_5
+
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=four_circles video_name:=low_four_circles_5
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=random_lines video_name:=low_random_lines_5
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=four_circles desired_velocity:=0.125 video_name:=med_low_speed_11
+
+#issue(1)
+[rviz2-1] Error:   Link 'panda_hand_tcp' declared as part of a chain in group 'panda_manipulator' is not known to the URDF
+[rviz2-1]          at line 200 in ./src/model.cpp
+[rviz2-1] Warning: Group 'panda_manipulator' is empty.
+[rviz2-1]          at line 245 in ./src/model.cpp
+[rviz2-1] Error:   Link 'camera_optical' declared as part of a chain in group 'panda_vision' is not known to the URDF
+[rviz2-1]          at line 200 in ./src/model.cpp
+[rviz2-1] Warning: Group 'panda_vision' is empty.
+[rviz2-1]          at line 245 in ./src/model.cpp
+
+This is beacuse there is no camera and gripper mounted on the real arm, so in this case modeify 
+/home/franka/ws_robots/src/franka_arm_ros2/franka_moveit_config/srdf/panda_arm.xacro
+
+<!-- <xacro:group_definition arm_id="${arm_id}" group_name="${arm_id}_manipulator" tip_link="${arm_id}_hand_tcp"/> -->
+
+    <!-- <xacro:group_definition arm_id="${arm_id}" group_name="${arm_id}_vision" tip_link="${camera_id}_optical"/> -->
+    
+ 
+#issue (2)
+
+if some pkg conflicts from different workspace, then need to manually to desigeninate any file used from which workspace
+
+source ~/ws_robots/install/setup.bash
+source ~/ws_sensors/install/setup.bash
+source ~/ws_active_perception/install/setup.bash
+source ~/ws_franka_moveit/install/setup.bash
+source ~/ws_robots/install/setup.bash #last one workspace is by default for new terminate window
+
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/franka/ws_franka_library/libfranka/build/"
+export LD_LIBRARY_PATH=/home/franka/ws_robots/install/franka_msgs/lib:$LD_LIBRARY_PATH
+export AMENT_PREFIX_PATH=/opt/ros/humble/share/moveit_ros_planning_interface:$AMENT_PREFIX_PATH
+
+
+
+
+
+-----------------------------------------------------------------------------
+
+
+
+ranka@franka-PC-BX19152:~/ws_active_perception$ source ~/ws_active_perception/install/setup.bash
+franka@franka-PC-BX19152:~/ws_active_perception$ colcon build --packages-select moveit2_commander_recorder
+
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py
+
+
+
+
+franka@franka-PC-BX19152:~/ws_robots$ colcon build --packages-select franka_moveit_config
+Starting >>> franka_moveit_config
+Finished <<< franka_moveit_config [0.14s]                  
+
+Summary: 1 package finished [0.44s]
+franka@franka-PC-BX19152:~/ws_robots$ source install/setup.bash
+franka@franka-PC-BX19152:~/ws_robots$ ros2 run franka_moveit_config simple_move_demo.py
+
+
+colcon build --packages-select franka_lock_unlock
+source install/setup.bash
+ros2 launch franka_lock_unlock franka_start.launch.xml hostname:=172.16.0.2 username:=Franka2 password:=frankalincoln
+
+
+
+
+
+
+
+
+

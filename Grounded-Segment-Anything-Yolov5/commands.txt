@@ -1,0 +1,476 @@
+conda activate ground_sam_yolov5
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+python counting_confidence_grounded_sam_v5.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Open-GroundingDino/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/newdrive/summerschool/Grounded-Segment-Anything/sam_hq_vit_b.pth --use_sam_hq  --input_dir ./counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda"
+
+
+python counting_confidence_grounded_sam.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Open-GroundingDino/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/newdrive/summerschool/Grounded-Segment-Anything/sam_hq_vit_b.pth --use_sam_hq  --input_dir ./counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda"
+
+
+python counting_confidence_detect.py --weights /home/newdrive/Phd/Modification_yolov5/runs/train/voc2060_yolov5s-ODConv-cotnet2/weights/best.pt --device 0 --save-txt --save-conf --source ./counting_confidence/yellow_pan
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+First part (shapes_speed):
+
+Ros端电脑使用程序/*1-6*/
+franka@franka-PC-BX19152:~/ws_active_perception$ source ~/ws_active_perception/install/setup.bash
+cd ~/ws_active_perception
+
+#add moveit_test.cpp to /src and revise  CMakeLists.txt
+
+colcon build --packages-select moveit2_commander_recorder --cmake-clean-cache
+
+colcon build --packages-select moveit2_commander_recorder # for cmakelist with opencv,如果带--cmake-clean-cache会导致opencv重新编译
+
+source install/setup.bash
+
+ros2 launch moveit2_commander_recorder moveit_test.launch.py shape:=four_circles desired_velocity:=0.125 video_name:=med_low_speed_11
+
+
+
+
+1. Get detection txt files and [result.write(file_name + '.jpg' + ',' + str(mean_confidence_value) + ',' + str(predict_number) + ',' + str(
+                blurriness) + ',' + str(entropy) + ',' + str(niqe) + ',' + str(score) + '\n')] into ./simulation_output/score/result_records.txt
+
+
+#代码中设置路径：video_folder = "/home/xumin/Music/low_density"  # 包含多个 .avi 视频的文件夹
+
+#txt without BBOX confidence (for laptop)
+python counting_confidence_detect_ground-sam_v9.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Open-GroundingDino/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/newdrive/summerschool/Grounded-Segment-Anything/sam_hq_vit_b.pth --use_sam_hq  --input_dir ./counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda" --weights /home/newdrive/Phd/Modification_yolov5/runs/train/voc2060_yolov5s-ODConv-cotnet2/weights/best.pt --device_yolo 0 --save-txt --source ./counting_confidence/yellow_pan
+
+#txt without BBOX confidence (for desktop)
+(ground_sam) xumin@xumin-PC-XB02309:~$ python counting_confidence_detect_ground-sam_v9.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Grounded-Segment-Anything/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/xumin/Grounded-Segment-Anything/weights/sam_hq_vit_b.pth --use_sam_hq  --input_dir /home/xumin/Grounded-Segment-Anything/counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda" --weights /home/xumin/Grounded-Segment-Anything/runs/train/voc2060_yolov5s-ODConv-cotnet2/weights/best.pt --device_yolo 0 --save-txt --source ./counting_confidence/yellow_pan
+
+
+
+
+#txt with BBOX confidence (for laptop)
+python counting_confidence_detect_ground-sam_v9.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Open-GroundingDino/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/newdrive/summerschool/Grounded-Segment-Anything/sam_hq_vit_b.pth --use_sam_hq  --input_dir ./counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda" --weights /home/newdrive/Phd/Modification_yolov5/runs/train/voc2060_yolov5s-ODConv-cotnet2/weights/best.pt --device_yolo 0 --save-txt --save-conf --source ./counting_confidence/yellow_pan
+
+#txt with BBOX confidence (for desktop)
+(ground_sam) xumin@xumin-PC-XB02309:~$ python counting_confidence_detect_ground-sam_v9.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Grounded-Segment-Anything/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/xumin/Grounded-Segment-Anything/weights/sam_hq_vit_b.pth --use_sam_hq  --input_dir /home/xumin/Grounded-Segment-Anything/counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda" --weights /home/xumin/Grounded-Segment-Anything/runs/train/voc2060_yolov5s-ODConv-cotnet2/weights/best.pt --device_yolo 0 --save-txt --save-conf --source ./counting_confidence/yellow_pan
+
+
+
+
+#用于制作demo视频
+counting_confidence_detect_ground-sam_v10_20251007.py
+
+
+
+
+2.  Generate GT labels
+
+#Find predicted_txt: ./runs/detect/exp/labels and then add classes.txt to this directory. After that: (base) xumin@xumin-lenovo-legion-y7000p-1060:~/labelImg-master$ python labelImg.py, using labelImg to correct the pred_labels (.txt) to get GT labels (.xml), rename it as ./Annotations
+
+
+3(不使用，需要对结果进行验证，使用step.4代替). #calculate counting result-related information + confusionmatrix: saved to runs/detect/exp5/labels
+
+#delete ./counting_result_information.txt
+
+conda activate ground_sam_yolov5
+
+#修改代码中的gt_real = 6 根据实际的数量
+#video_folder = "/home/xumin/Music/111"  # 包含多个 .avi 视频的文件夹
+
+python counting_confidence_detect_ground-sam_v11.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Open-GroundingDino/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/newdrive/summerschool/Grounded-Segment-Anything/sam_hq_vit_b.pth --use_sam_hq  --input_dir ./counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda" --weights /home/newdrive/Phd/Modification_yolov5/runs/train/voc2060_yolov5s-ODConv-cotnet2/weights/best.pt --device_yolo 0 --save-txt --save-conf --xml ./runs/detect/counting_confidence_low_density_shapes/Annotations/ --source ./counting_confidence/yellow_pan_low_density_shapes
+
+4. confusionmatrix + vis_TPFPFN + save TP,FP,FN, Realiability = tp / (tp + fp + fn)， gt_image (图像中的蚜虫数量)， gt_real（yellow pan中真实的蚜虫数量）into counting_result_information_low_density_shapes.txt
+
+#convert annotaions .xml to yolo format .txt
+ 
+copy ./Annotations & ./yellow_pan_low_density_shapes (rename as ./JPEGImages) to ./dataset/voc2071, copy and set up /home/newdrive/Phd/Modification_yolov5/dataset/voc2071/ImageSets
+
+python txt_2.py #generate /voc2071/ImageSets/Main/test.txt  train.txt  trainval.txt  val.txt
+
+python voc_label_2071.py # to get ./dataset/voc2071/labels
+
+#delete pre-exist counting_result_information.txt
+#对应修改gt_real = 6 # 12,18 gt number of aphids in the yellow pan
+#对应修改路径：
+img_path = './dataset/voc2072/JPEGImages/'
+    Annotations_path = './dataset/voc2072/Annotations' #gt_Annotations_VOC_format
+    label_path = './dataset/voc2072/labels/' #gt_Annotations_yolo_format
+    predict_path = './runs/detect/counting_confidence_med_density_shapes_without_conf/pred_labels' #pred_labels
+    save_path = './runs/detect/counting_confidence_med_density_shapes_without_conf/vis_TPFPFN/'
+
+
+python vis_TPFPFN.py 
+
+#注意，如果不需要draw BBox的confidence 则，
+#confidence = pred[max_iou_idx][5]  # 获取置信度
+confidence = None
+
+
+
+5. copy result_records.txt (rename as result_records_low_density_shapes.txt) and counting_result_information_low_density_shapes.txt to ./analysis/
+
+python sorting.py  #修改路径
+
+
+# 文件路径 - 请根据实际情况修改
+records_file = "result_records_low_density_shapes.txt"
+counting_file = "counting_result_information_low_density_shapes_sorted.txt"
+
+#match = re.match(r"low_(\w+)_(\d+)_frame_(\d+)\.jpg", name)
+match = re.match(r"med_(\w+)_(\d+)_frame_(\d+)\.jpg", name)
+#match = re.match(r"high_(\w+)_(\d+)_frame_(\d+)\.jpg", name)
+
+#记得切换两种不同的模式
+#weighted_scores[shape] += (1 / value) * weight  # 越小越好，取倒数，using 6 metrics and Error with Derivative handles negative influence
+#weighted_scores[shape] -= value * weight  # 越小越好，using 6 metrics and Error with Negative sign handles negative influence
+
+python analysis_total.py  #修改路径
+
+
+
+
+# 文件路径 - 请根据实际情况修改
+records_file = "result_records_low_density_shapes.txt"
+counting_file = "counting_result_information_low_density_shapes_sorted.txt"
+
+#match = re.match(r"low_(\w+)_(\d+)_frame_(\d+)\.jpg", name)
+match = re.match(r"med_(\w+)_(\d+)_frame_(\d+)\.jpg", name)
+#match = re.match(r"high_(\w+)_(\d+)_frame_(\d+)\.jpg", name)
+
+python validate_initial_conditions.py #修改路径
+
+
+
+
+Second part (constant_adaptive speed):
+
+1.设置两台电脑的网络在同一local
+
+sudo nm-connection-editor
+IPv4 Settings
+manual
+Address:192.168.1.20
+子网掩码：255.255.255.0
+网关：留空
+
+sudo nm-connection-editor
+IPv4 Settings
+manual
+Address:192.168.1.10
+子网掩码：255.255.255.0
+网关：留空
+
+首先通过ping测试,之后单独使用Ethernet_send_receiver测试
+
+2.Ros 端电脑(对应程序: 2-4)
+
+colcon build --packages-select moveit2_commander_recorder # for cmakelist with opencv,如果带--cmake-clean-cache会导致opencv重新编译
+
+source install/setup.bash
+
+franka@franka-PC-BX19152:~/ws_active_perception$ ros2 launch moveit2_commander_recorder moveit_test.launch.py
+
+3.计数端电脑
+python counting_confidence_detect_ground-sam_v10_20250903.py --config GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py --grounded_checkpoint /home/xumin/Open-GroundingDino/weights/groundingdino_swint_ogc.pth --sam_hq_checkpoint /home/newdrive/summerschool/Grounded-Segment-Anything/sam_hq_vit_b.pth --use_sam_hq  --input_dir ./counting_confidence/src --output_dir "./simulation_output/image_processing" --box_threshold 0.5 --text_threshold 0.25 --device "cuda" --weights /home/newdrive/Phd/Modification_yolov5/runs/train/voc2060_yolov5s-ODConv-cotnet2/weights/best.pt --device_yolo 0 --save-txt --source ./counting_confidence/yellow_pan
+
+结果会保存在./counting_confidence, ./runs/detect/counting_confidence, ./simulation_output中和终端的打印信息.
+
+
+
+
+
+
+
+
+(ground_sam_yolov5) xumin@xumin-lenovo-legion-y7000p-1060:/home/newdrive/Phd/Grounded-Segment-Anything-Yolov5$ conda list
+# packages in environment at /home/xumin/anaconda3/envs/ground_sam_yolov5:
+#
+# Name                    Version                   Build  Channel
+_libgcc_mutex             0.1                        main  
+_openmp_mutex             5.1                       1_gnu  
+absl-py                   2.3.0                    pypi_0    pypi
+accelerate                1.0.1                    pypi_0    pypi
+addict                    2.4.0                    pypi_0    pypi
+aiofiles                  23.2.1                   pypi_0    pypi
+aiohappyeyeballs          2.4.4                    pypi_0    pypi
+aiohttp                   3.10.11                  pypi_0    pypi
+aiosignal                 1.3.1                    pypi_0    pypi
+aliyun-python-sdk-core    2.16.0                   pypi_0    pypi
+aliyun-python-sdk-kms     2.16.5                   pypi_0    pypi
+annotated-types           0.7.0                    pypi_0    pypi
+anyio                     4.5.2                    pypi_0    pypi
+asttokens                 3.0.0                    pypi_0    pypi
+async-timeout             5.0.1                    pypi_0    pypi
+attrs                     25.3.0                   pypi_0    pypi
+backcall                  0.2.0                    pypi_0    pypi
+bitsandbytes              0.45.0                   pypi_0    pypi
+blas                      1.0                         mkl  
+brotli-python             1.0.9            py38h6a678d5_8  
+bzip2                     1.0.8                h5eee18b_6  
+ca-certificates           2025.2.25            h06a4308_0  
+cachetools                5.5.2                    pypi_0    pypi
+certifi                   2025.4.26                pypi_0    pypi
+cffi                      1.17.1                   pypi_0    pypi
+cfgv                      3.4.0                    pypi_0    pypi
+charset-normalizer        2.1.0                    pypi_0    pypi
+click                     8.1.8                    pypi_0    pypi
+colorama                  0.4.6                    pypi_0    pypi
+coloredlogs               15.0.1                   pypi_0    pypi
+comm                      0.2.2                    pypi_0    pypi
+contourpy                 1.1.1                    pypi_0    pypi
+crcmod                    1.7                      pypi_0    pypi
+cryptography              45.0.4                   pypi_0    pypi
+cudatoolkit               11.3.1               h2bc3f7f_2  
+cycler                    0.12.1                   pypi_0    pypi
+datasets                  3.1.0                    pypi_0    pypi
+debugpy                   1.8.14                   pypi_0    pypi
+decorator                 5.2.1                    pypi_0    pypi
+defusedxml                0.7.1                    pypi_0    pypi
+diffusers                 0.33.1                   pypi_0    pypi
+dill                      0.3.8                    pypi_0    pypi
+distlib                   0.3.9                    pypi_0    pypi
+distro                    1.9.0                    pypi_0    pypi
+einops                    0.6.1                    pypi_0    pypi
+exceptiongroup            1.3.0                    pypi_0    pypi
+executing                 2.2.0                    pypi_0    pypi
+facexlib                  0.3.0                    pypi_0    pypi
+fairscale                 0.4.13                   pypi_0    pypi
+fastapi                   0.115.12                 pypi_0    pypi
+ffmpeg                    4.3                  hf484d3e_0    pytorch
+ffmpy                     0.5.0                    pypi_0    pypi
+filelock                  3.14.0                   pypi_0    pypi
+filterpy                  1.4.5                    pypi_0    pypi
+flatbuffers               25.2.10                  pypi_0    pypi
+fonttools                 4.57.0                   pypi_0    pypi
+freetype                  2.13.3               h4a9f257_0  
+frozenlist                1.5.0                    pypi_0    pypi
+fsspec                    2024.9.0                 pypi_0    pypi
+ftfy                      6.2.3                    pypi_0    pypi
+future                    1.0.0                    pypi_0    pypi
+gmp                       6.3.0                h6a678d5_0  
+gnutls                    3.6.15               he1e5248_0  
+google-auth               2.40.3                   pypi_0    pypi
+google-auth-oauthlib      1.0.0                    pypi_0    pypi
+gradio                    4.44.1                   pypi_0    pypi
+gradio-client             1.3.0                    pypi_0    pypi
+groundingdino             0.1.0                    pypi_0    pypi
+grpcio                    1.70.0                   pypi_0    pypi
+h11                       0.16.0                   pypi_0    pypi
+hdbscan                   0.8.40                   pypi_0    pypi
+hf-xet                    1.1.3                    pypi_0    pypi
+httpcore                  1.0.9                    pypi_0    pypi
+httpx                     0.28.1                   pypi_0    pypi
+huggingface-hub           0.33.0                   pypi_0    pypi
+humanfriendly             10.0                     pypi_0    pypi
+icecream                  2.1.4                    pypi_0    pypi
+identify                  2.6.1                    pypi_0    pypi
+idna                      3.10                     pypi_0    pypi
+imageio                   2.35.1                   pypi_0    pypi
+importlib-metadata        8.5.0                    pypi_0    pypi
+importlib-resources       6.4.5                    pypi_0    pypi
+iniconfig                 2.1.0                    pypi_0    pypi
+intel-openmp              2023.1.0         hdb19cb5_46306  
+ipykernel                 6.29.5                   pypi_0    pypi
+ipython                   8.12.3                   pypi_0    pypi
+jedi                      0.19.2                   pypi_0    pypi
+jinja2                    3.1.6                    pypi_0    pypi
+jiter                     0.9.1                    pypi_0    pypi
+jmespath                  0.10.0                   pypi_0    pypi
+joblib                    1.4.2                    pypi_0    pypi
+jpeg                      9e                   h5eee18b_3  
+jsonschema                4.23.0                   pypi_0    pypi
+jsonschema-specifications 2023.12.1                pypi_0    pypi
+jupyter-client            8.6.3                    pypi_0    pypi
+jupyter-core              5.8.1                    pypi_0    pypi
+kiwisolver                1.4.7                    pypi_0    pypi
+lame                      3.100                h7b6447c_0  
+lazy-loader               0.4                      pypi_0    pypi
+lcms2                     2.16                 hb9589c4_0  
+ld_impl_linux-64          2.40                 h12ee557_0  
+lerc                      4.0.0                h6a678d5_0  
+libdeflate                1.22                 h5eee18b_0  
+libffi                    3.4.4                h6a678d5_1  
+libgcc-ng                 11.2.0               h1234567_1  
+libgomp                   11.2.0               h1234567_1  
+libiconv                  1.16                 h5eee18b_3  
+libidn2                   2.3.4                h5eee18b_0  
+libpng                    1.6.39               h5eee18b_0  
+libstdcxx-ng              11.2.0               h1234567_1  
+libtasn1                  4.19.0               h5eee18b_0  
+libtiff                   4.5.1                hffd6297_1  
+libunistring              0.9.10               h27cfd23_0  
+libwebp-base              1.3.2                h5eee18b_1  
+libxcb                    1.17.0               h9b100fa_0  
+litellm                   1.72.4                   pypi_0    pypi
+llvmlite                  0.41.1                   pypi_0    pypi
+lmdb                      1.6.2                    pypi_0    pypi
+lz4-c                     1.9.4                h6a678d5_1  
+markdown                  3.7                      pypi_0    pypi
+markdown-it-py            3.0.0                    pypi_0    pypi
+markupsafe                2.1.5                    pypi_0    pypi
+matplotlib                3.7.5                    pypi_0    pypi
+matplotlib-inline         0.1.7                    pypi_0    pypi
+mdurl                     0.1.2                    pypi_0    pypi
+mkl                       2023.1.0         h213fc3f_46344  
+mkl-service               2.4.0            py38h5eee18b_1  
+mkl_fft                   1.3.8            py38h5eee18b_0  
+mkl_random                1.2.4            py38hdb19cb5_0  
+mmcv                      2.0.0                    pypi_0    pypi
+mmcv-full                 1.7.1                    pypi_0    pypi
+mmengine                  0.10.7                   pypi_0    pypi
+model-index               0.1.11                   pypi_0    pypi
+mpmath                    1.3.0                    pypi_0    pypi
+multidict                 6.1.0                    pypi_0    pypi
+multiprocess              0.70.16                  pypi_0    pypi
+ncurses                   6.4                  h6a678d5_0  
+nest-asyncio              1.6.0                    pypi_0    pypi
+nettle                    3.7.3                hbbd107a_1  
+networkx                  3.1                      pypi_0    pypi
+nltk                      3.9.1                    pypi_0    pypi
+nodeenv                   1.9.1                    pypi_0    pypi
+numba                     0.58.1                   pypi_0    pypi
+numpy                     1.24.4                   pypi_0    pypi
+numpy-base                1.24.3           py38h060ed82_1  
+nvidia-cublas-cu12        12.1.3.1                 pypi_0    pypi
+nvidia-cuda-cupti-cu12    12.1.105                 pypi_0    pypi
+nvidia-cuda-nvrtc-cu12    12.1.105                 pypi_0    pypi
+nvidia-cuda-runtime-cu12  12.1.105                 pypi_0    pypi
+nvidia-cudnn-cu12         9.1.0.70                 pypi_0    pypi
+nvidia-cufft-cu12         11.0.2.54                pypi_0    pypi
+nvidia-curand-cu12        10.3.2.106               pypi_0    pypi
+nvidia-cusolver-cu12      11.4.5.107               pypi_0    pypi
+nvidia-cusparse-cu12      12.1.0.106               pypi_0    pypi
+nvidia-nccl-cu12          2.20.5                   pypi_0    pypi
+nvidia-nvjitlink-cu12     12.9.86                  pypi_0    pypi
+nvidia-nvtx-cu12          12.1.105                 pypi_0    pypi
+oauthlib                  3.2.2                    pypi_0    pypi
+onnx                      1.17.0                   pypi_0    pypi
+onnxruntime               1.19.2                   pypi_0    pypi
+openai                    1.86.0                   pypi_0    pypi
+openai-clip               1.0.1                    pypi_0    pypi
+opencv-python             4.11.0.86                pypi_0    pypi
+opencv-python-headless    4.11.0.86                pypi_0    pypi
+opendatalab               0.0.10                   pypi_0    pypi
+openh264                  2.1.1                h4ff587b_0  
+openjpeg                  2.5.2                he7f1fd0_0  
+openmim                   0.3.9                    pypi_0    pypi
+openssl                   3.0.16               h5eee18b_0  
+openxlab                  0.1.2                    pypi_0    pypi
+ordered-set               4.1.0                    pypi_0    pypi
+orjson                    3.10.15                  pypi_0    pypi
+oss2                      2.17.0                   pypi_0    pypi
+packaging                 24.2                     pypi_0    pypi
+pandas                    2.0.3                    pypi_0    pypi
+parso                     0.8.4                    pypi_0    pypi
+patsy                     1.0.1                    pypi_0    pypi
+pexpect                   4.9.0                    pypi_0    pypi
+pickleshare               0.7.5                    pypi_0    pypi
+pillow                    10.4.0           py38h5eee18b_0  
+pip                       24.2             py38h06a4308_0  
+pkgutil-resolve-name      1.3.10                   pypi_0    pypi
+platformdirs              4.3.6                    pypi_0    pypi
+pluggy                    1.5.0                    pypi_0    pypi
+pre-commit                3.5.0                    pypi_0    pypi
+prompt-toolkit            3.0.51                   pypi_0    pypi
+propcache                 0.2.0                    pypi_0    pypi
+protobuf                  3.20.1                   pypi_0    pypi
+psutil                    7.0.0                    pypi_0    pypi
+pthread-stubs             0.3                  h0ce48e5_1  
+ptyprocess                0.7.0                    pypi_0    pypi
+pure-eval                 0.2.3                    pypi_0    pypi
+pyarrow                   17.0.0                   pypi_0    pypi
+pyasn1                    0.6.1                    pypi_0    pypi
+pyasn1-modules            0.4.2                    pypi_0    pypi
+pycocotools               2.0.7                    pypi_0    pypi
+pycparser                 2.22                     pypi_0    pypi
+pycryptodome              3.23.0                   pypi_0    pypi
+pydantic                  2.10.6                   pypi_0    pypi
+pydantic-core             2.27.2                   pypi_0    pypi
+pydub                     0.25.1                   pypi_0    pypi
+pygments                  2.19.1                   pypi_0    pypi
+pyiqa                     0.1.13                    dev_0    <develop>
+pyparsing                 3.1.4                    pypi_0    pypi
+pysocks                   1.7.1            py38h06a4308_0  
+pytest                    8.3.5                    pypi_0    pypi
+python                    3.8.20               he870216_0  
+python-dateutil           2.9.0.post0              pypi_0    pypi
+python-dotenv             1.0.1                    pypi_0    pypi
+python-multipart          0.0.20                   pypi_0    pypi
+pytorch                   1.12.1          py3.8_cuda11.3_cudnn8.3.2_0    pytorch
+pytorch-mutex             1.0                        cuda    pytorch
+pytz                      2023.4                   pypi_0    pypi
+pywavelets                1.4.1                    pypi_0    pypi
+pyyaml                    6.0.2                    pypi_0    pypi
+pyzmq                     26.4.0                   pypi_0    pypi
+readline                  8.2                  h5eee18b_0  
+referencing               0.35.1                   pypi_0    pypi
+regex                     2024.11.6                pypi_0    pypi
+requests                  2.32.4                   pypi_0    pypi
+requests-oauthlib         2.0.0                    pypi_0    pypi
+rich                      13.4.2                   pypi_0    pypi
+rpds-py                   0.20.1                   pypi_0    pypi
+rsa                       4.9.1                    pypi_0    pypi
+ruff                      0.11.13                  pypi_0    pypi
+safetensors               0.5.3                    pypi_0    pypi
+scikit-image              0.21.0                   pypi_0    pypi
+scikit-learn              1.3.2                    pypi_0    pypi
+scipy                     1.10.0                   pypi_0    pypi
+seaborn                   0.13.2                   pypi_0    pypi
+segment-anything          1.0                       dev_0    <develop>
+semantic-version          2.10.0                   pypi_0    pypi
+sentencepiece             0.2.0                    pypi_0    pypi
+setuptools                60.2.0                   pypi_0    pypi
+shellingham               1.5.4                    pypi_0    pypi
+six                       1.17.0                   pypi_0    pypi
+sniffio                   1.3.1                    pypi_0    pypi
+sqlite                    3.45.3               h5eee18b_0  
+stack-data                0.6.3                    pypi_0    pypi
+starlette                 0.44.0                   pypi_0    pypi
+statsmodels               0.14.1                   pypi_0    pypi
+supervision               0.25.1                   pypi_0    pypi
+sympy                     1.13.3                   pypi_0    pypi
+tabulate                  0.9.0                    pypi_0    pypi
+tbb                       2021.8.0             hdb19cb5_0  
+tensorboard               2.14.0                   pypi_0    pypi
+tensorboard-data-server   0.7.2                    pypi_0    pypi
+termcolor                 2.4.0                    pypi_0    pypi
+thop                      0.1.1-2209072238          pypi_0    pypi
+threadpoolctl             3.5.0                    pypi_0    pypi
+tifffile                  2023.7.10                pypi_0    pypi
+tiktoken                  0.7.0                    pypi_0    pypi
+timm                      0.6.7                    pypi_0    pypi
+tk                        8.6.14               h993c535_1  
+tokenizers                0.15.2                   pypi_0    pypi
+tomli                     2.2.1                    pypi_0    pypi
+tomlkit                   0.12.0                   pypi_0    pypi
+torchaudio                0.12.1               py38_cu113    pytorch
+torchvision               0.13.1                   pypi_0    pypi
+tornado                   6.4.2                    pypi_0    pypi
+tqdm                      4.67.1                   pypi_0    pypi
+traitlets                 5.14.3                   pypi_0    pypi
+transformers              4.37.2                   pypi_0    pypi
+triton                    3.0.0                    pypi_0    pypi
+typer                     0.16.0                   pypi_0    pypi
+typing-extensions         4.13.2                   pypi_0    pypi
+typing_extensions         4.1.1              pyh06a4308_0  
+tzdata                    2025.2                   pypi_0    pypi
+urllib3                   2.2.3            py38h06a4308_0  
+uvicorn                   0.33.0                   pypi_0    pypi
+virtualenv                20.31.2                  pypi_0    pypi
+wcwidth                   0.2.13                   pypi_0    pypi
+websockets                12.0                     pypi_0    pypi
+werkzeug                  3.0.6                    pypi_0    pypi
+wheel                     0.44.0           py38h06a4308_0  
+xorg-libx11               1.8.12               h9b100fa_1  
+xorg-libxau               1.0.12               h9b100fa_0  
+xorg-libxdmcp             1.1.5                h9b100fa_0  
+xorg-xorgproto            2024.1               h5eee18b_1  
+xxhash                    3.5.0                    pypi_0    pypi
+xz                        5.6.4                h5eee18b_1  
+yapf                      0.43.0                   pypi_0    pypi
+yarl                      1.15.2                   pypi_0    pypi
+zipp                      3.20.2                   pypi_0    pypi
+zlib                      1.2.13               h5eee18b_1  
+
+
+
+
+
