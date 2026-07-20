@@ -151,6 +151,14 @@ python counting_confidence_detect_ground-sam_v10_20250903.py --config GroundingD
 #Results will be saved to ./counting_confidence, ./runs/detect/counting_confidence, and ./simulation_output, and progress information will also be printed to the console.
 
 
+## Citation
+Gao, X., Stevens, M. and Cielniak, G., 2025. A Robotic Stirring Method with Trajectory Optimization and Adaptive Speed Control for Accurate Pest Counting in Water Traps. arXiv preprint arXiv:2510.21732.
+
+## Contact
+If you have any issue, please contact us.
+
+
+
 
 
 
